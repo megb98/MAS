@@ -1,5 +1,6 @@
 package com.example.ikigai
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.ikigai.databinding.ActivityMainBinding
@@ -7,20 +8,33 @@ import com.example.ikigai.service.AnimeService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var database : DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
+        var count = 1
         setContentView(binding.root)
+
+        fun View.hideKeyboard() {
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(windowToken, 0)
+        }
 
         binding.apply {
             val animeService = AnimeService.create()
@@ -28,6 +42,22 @@ class MainActivity : AppCompatActivity() {
             btnSearch.setOnClickListener {
                 val searchedAnime = searchInputEditText.text.toString()
                 val callSearchedAnime = animeService.getSearchedAnime(searchedAnime)
+                count = count + 1
+
+                database = FirebaseDatabase.getInstance().getReference("History")
+                database.child(count.toString()).setValue(searchedAnime).addOnSuccessListener {
+                    Toast.makeText(this@MainActivity,"Anime added to History", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Toast.makeText(this@MainActivity,"Failed", Toast.LENGTH_SHORT).show()
+                }
+
+//                database = FirebaseDatabase.getInstance().getReference("https://ikigai-6df43-default-rtdb.firebaseio.com/")
+//                val History = History(searchedAnime)
+//                database.child(count.toString()).setValue(History).addOnSuccessListener {
+//                    Toast.makeText(this@MainActivity,"Anime added to History", Toast.LENGTH_SHORT).show()
+//                }
+
+                binding.root.hideKeyboard()
 
                 callSearchedAnime.enqueue(object : Callback<SearchedAnime> {
 
