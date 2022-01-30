@@ -48,14 +48,9 @@ class MainActivity : AppCompatActivity() {
                 database.child(count.toString()).setValue(searchedAnime).addOnSuccessListener {
                     Toast.makeText(this@MainActivity,"Anime added to History", Toast.LENGTH_SHORT).show()
                 }.addOnFailureListener {
-                    Toast.makeText(this@MainActivity,"Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity,"Failed to add to History", Toast.LENGTH_SHORT).show()
                 }
 
-//                database = FirebaseDatabase.getInstance().getReference("https://ikigai-6df43-default-rtdb.firebaseio.com/")
-//                val History = History(searchedAnime)
-//                database.child(count.toString()).setValue(History).addOnSuccessListener {
-//                    Toast.makeText(this@MainActivity,"Anime added to History", Toast.LENGTH_SHORT).show()
-//                }
 
                 binding.root.hideKeyboard()
 
